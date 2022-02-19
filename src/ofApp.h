@@ -22,7 +22,6 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-	int hue;
 	ofEasyCam cam;
 	ofLight light;
 };
@@ -43,5 +42,5 @@ public:
 	double size;
 	double mass;
 	glm::vec3 position, velocity, acceleration; // 3D vectors for particles physics
+	vector<glm::vec3> trail;
 };
-
