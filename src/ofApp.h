@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxGui.h"
 
 class ofApp : public ofBaseApp
 {
@@ -24,6 +25,11 @@ public:
 
 	ofEasyCam cam;
 	ofLight light;
+	ofxPanel gui;
+
+	ofxIntSlider intSlider1;
+	ofxIntSlider intSlider2;
+	ofxLabel label;
 };
 
 class body
