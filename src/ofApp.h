@@ -30,6 +30,7 @@ public:
 	ofxIntSlider intSlider1;
 	ofxIntSlider intSlider2;
 	ofxLabel label;
+	ofxLabel fps_label;
 };
 
 class body

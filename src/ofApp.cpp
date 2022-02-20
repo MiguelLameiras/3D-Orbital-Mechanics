@@ -86,6 +86,7 @@ void ofApp::setup()
     gui.add(label.setup("","Press Space to start"));
     gui.add(intSlider1.setup("Planets",15,1,20));
     gui.add(intSlider2.setup("Asteroids",15,0,20));
+    gui.add(fps_label.setup("","fps:"));
 }
 
 //--------------------------------------------------------------
@@ -98,9 +99,8 @@ void ofApp::update()
     }
 
     std::stringstream strm;
-    strm << "fps: " << ofGetFrameRate();
-    ofSetWindowTitle(strm.str());
-
+    strm << "Fps: " << ofGetFrameRate();
+    fps_label.setup("", strm.str());
 }
 
 //--------------------------------------------------------------
