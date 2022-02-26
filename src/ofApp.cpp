@@ -6,6 +6,7 @@ int Num_Planets;
 int Num_Asteroids;
 int Temp_Num_Planets;
 int Temp_Num_Asteroids;
+int Temp_Num_Stars;
 double Initial_Max_Velocity;
 
 body::body(int x, int y, int z, double mass_, int hue)
@@ -86,13 +87,12 @@ void ofApp::setup()
     start = false;
     show_trails = true;
     show_axis = false;
+    show_center = false;
     star_relative_mass = 10000;
 
-    Num_Planets = 15;
-    Num_Asteroids = 15;
     Temp_Num_Planets = 15;
     Temp_Num_Asteroids = 15;
-    Num_Stars = 1;
+    Temp_Num_Stars = 1;
     Initial_Max_Velocity = 4;
 
     ofEnableLighting();
@@ -119,13 +119,15 @@ void ofApp::setup()
     UI->addSlider("Planets", 0, 250, 15);
     UI->addSlider("Asteroids", 0, 250, 15);
     UI->addSlider("Proximity", 0, 1, 0.2);
-    UI->addSlider("Initial \n Kinetic Energy", 0, 10, 4);
+    UI->addSlider("Kinetic Energy", 0, 10, 4);
 
     UI->addBreak();
 
     // and a couple of simple buttons //
     UI->addToggle("Show Trails", true);
     UI->addToggle("Show Axis", false);
+    UI->addToggle("Center of Mass", false);
+    UI->addButton("Start Simulation");
 
     // adding the optional header allows you to drag the gui around //
     UI->addHeader(":: drag me to reposition ::");
@@ -141,7 +143,7 @@ void ofApp::setup()
     UI->onColorPickerEvent(this, &ofApp::onColorPickerEvent);
 
     UI->setOpacity(0);
-    //  gui->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+    //UI->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 }
 
 //--------------------------------------------------------------
@@ -175,15 +177,19 @@ void ofApp::update()
 void ofApp::draw()
 {
     ofEnableLighting();
-    ofEnableDepthTest();
+    //ofEnableDepthTest();
+    light.enable();
     cam.begin();
-    cam.setTarget(glm::vec3(0, 0, 0));
     if (start && Num_Stars == 1)
         cam.setTarget(bodies[0].position); // Define the point where the camera rotates around
-    // ofRotateDeg(90, 0, 0, 1); // Rotate the camera to a position
-    light.enable();
-    // ofSetColor(255,255,255);
-    // ofDrawSphere(center_of_mass, 10);
+    else if(start)
+        cam.setTarget(center_of_mass);
+    //ofRotateDeg(90, 0, 0, 1); // Rotate the camera to a position
+    if(show_center)
+    {
+        ofSetColor(255,255,255);
+        ofDrawSphere(center_of_mass, 10);
+    }
     if (show_axis)
     {
         ofDrawGrid(1000); // Draw axis
@@ -194,9 +200,9 @@ void ofApp::draw()
         bodies[i].draw();
     }
 
-    light.disable();
     cam.end();
-    ofDisableDepthTest();
+    light.disable();
+    //ofDisableDepthTest();
     ofDisableLighting();
 }
 
@@ -214,16 +220,16 @@ void ofApp::keyPressed(int key)
 
         Num_Planets = Temp_Num_Planets;
         Num_Asteroids = Temp_Num_Asteroids;
+        Num_Stars = Temp_Num_Stars;
 
         int init = 500 * (1 - proximity) + Num_Planets;
 
         // Create Planets
         for (int i = 0; i < Num_Stars; i++)
         {
-            body newbody(ofRandom(-init, init), ofRandom(-init, init), ofRandom(-init, init), ofRandom(star_relative_mass - 5000, star_relative_mass + 5000), ofRandom(0, 60));
+            body newbody(ofRandom(-init, init), ofRandom(-init, init), ofRandom(-init, init), ofRandom(star_relative_mass - 5000, star_relative_mass + 5000), ofRandom(10, 50));
             bodies.push_back(newbody);
         }
-
         // Create Planets
         for (int i = Num_Stars; i < Num_Planets; i++)
         {
@@ -294,7 +300,8 @@ void ofApp::dragEvent(ofDragInfo dragInfo)
 
 void ofApp::onButtonEvent(ofxDatGuiButtonEvent e)
 {
-    // cout << "onButtonEvent: " << e.target->getLabel() << endl;
+    if (e.target->is("Start Simulation"))
+        keyPressed(' ');
 }
 
 void ofApp::onToggleEvent(ofxDatGuiToggleEvent e)
@@ -310,6 +317,11 @@ void ofApp::onToggleEvent(ofxDatGuiToggleEvent e)
             show_trails = false;
         else
             show_trails = true;
+    if (e.target->is("Center of Mass"))
+        if (show_center)
+            show_center = false;
+        else
+            show_center = true;
 }
 
 void ofApp::onSliderEvent(ofxDatGuiSliderEvent e)
@@ -322,10 +334,10 @@ void ofApp::onSliderEvent(ofxDatGuiSliderEvent e)
     if (e.target->is("Proximity"))
         proximity = e.target->getValue();
     if (e.target->is("Number of Stars"))
-        Num_Stars = (int)e.target->getValue();
+        Temp_Num_Stars = (int)e.target->getValue();
     if (e.target->is("Relative Mass"))
-        star_relative_mass = (int)e.target->getValue();
-    if (e.target->is("Initial \n Kinetic Energy"))
+        star_relative_mass = e.target->getValue();
+    if (e.target->is("Kinetic Energy"))
         Initial_Max_Velocity = e.target->getValue();
 }
 

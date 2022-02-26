@@ -34,6 +34,7 @@ public:
 	bool start;
 	bool show_trails;
 	bool show_axis;
+	bool show_center;
 	ofEasyCam cam;
 	ofLight light;
 	ofxDatGui *UI;
