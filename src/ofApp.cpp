@@ -9,7 +9,7 @@ double Initial_Max_Velocity;
 body::body(int x, int y, int z, double mass_, int hue)
 {
     position = glm::vec3(x, y, z);                                                             // Initial position
-    double init = Initial_Max_Velocity;                                                                           // Range of possible initial velocities
+    double init = Initial_Max_Velocity;                                                        // Range of possible initial velocities
     velocity = glm::vec3(ofRandom(-init, init), ofRandom(-init, init), ofRandom(-init, init)); // Initial random velocity
     mass = mass_;
     if (mass < 100)
@@ -93,7 +93,7 @@ void ofApp::setup()
     Initial_Max_Velocity = 4;
 
     ofEnableLighting();
-    light.setPosition(0, 0, 0);
+    light.setPosition(500, 500, 500);
 
     ofSetSphereResolution(10);
 
@@ -107,16 +107,19 @@ void ofApp::setup()
     ofxDatGuiFolder *folder = UI->addFolder("Stars", ofColor::orange);
     folder->addSlider("Number of Stars", 0, 5, 1);
     folder->addSlider("Relative Mass", 10000, 100000, 10000);
-
+    folder->expand();
     folder->onSliderEvent(this, &ofApp::onSliderEvent);
 
     UI->addBreak();
 
+    ofxDatGuiFolder *folder2 = UI->addFolder("Initial Conditions", ofColor::pink);
     // add a couple range sliders //
-    UI->addSlider("Planets", 0, 250, 15);
-    UI->addSlider("Asteroids", 0, 250, 15);
-    UI->addSlider("Proximity", 0, 1, 0.2);
-    UI->addSlider("Kinetic Energy", 0, 10, 4);
+    folder2->addSlider("Planets", 0, 250, 15);
+    folder2->addSlider("Asteroids", 0, 250, 15);
+    folder2->addSlider("Proximity", 0, 1, 0.2);
+    folder2->addSlider("Kinetic Energy", 0, 10, 4);
+    folder2->expand();
+    folder2->onSliderEvent(this, &ofApp::onSliderEvent);
 
     UI->addBreak();
 
@@ -140,7 +143,7 @@ void ofApp::setup()
     UI->onColorPickerEvent(this, &ofApp::onColorPickerEvent);
 
     UI->setOpacity(0);
-    //UI->setLabelAlignment(ofxDatGuiAlignment::CENTER);
+    // UI->setLabelAlignment(ofxDatGuiAlignment::CENTER);
 }
 
 //--------------------------------------------------------------
@@ -177,18 +180,19 @@ void ofApp::draw()
     ofEnableDepthTest();
     light.enable();
     cam.begin();
-    cam.setTarget(glm::vec3(0, 0, 0));
-    if (start && Num_Stars == 1)
-        cam.setTarget(bodies[0].position); // Define the point where the camera rotates around
-    else if(start)
+    // cam.setTarget(glm::vec3(0, 0, 0));
+    if (start)
         cam.setTarget(center_of_mass);
-    //ofRotateDeg(90, 0, 0, 1); // Rotate the camera to a position
+    else if (start && Num_Stars == 1)
+        cam.setTarget(bodies[0].position); // Define the point where the camera rotates around
+    // ofRotateDeg(90, 0, 0, 1); // Rotate the camera to a position
 
-    if(show_center)
+    if (show_center)
     {
-        ofSetColor(255,255,255);
+        ofSetColor(255, 255, 255);
         ofDrawSphere(center_of_mass, 10);
     }
+
     if (show_axis)
     {
         ofDrawGrid(1000); // Draw axis
@@ -198,7 +202,6 @@ void ofApp::draw()
     {
         bodies[i].draw();
     }
-
     cam.end();
     light.disable();
     ofDisableDepthTest();
@@ -210,20 +213,14 @@ void ofApp::keyPressed(int key)
 {
     switch (key)
     {
-    case 'f':
-    case 'F':
-        ofToggleFullscreen();
-        break;
     case ' ':
         bodies.clear();
 
-        Num_Planets = Temp_Num_Planets;
-        Num_Asteroids = Temp_Num_Asteroids;
-        Num_Stars = Temp_Num_Stars;
+        Num_Planets = (int)UI->getSlider("Planets")->getValue();
+        Num_Asteroids = (int)UI->getSlider("Asteroids")->getValue();
+        Num_Stars = (int)UI->getSlider("Number of Stars")->getValue();
 
         int init = 500 * (1 - proximity) + Num_Planets;
-
-        std::cout << Num_Planets << " " << Num_Asteroids << " " << Num_Stars << std::endl;
 
         // Create Planets
         for (int i = 0; i < Num_Stars; i++)
@@ -232,13 +229,13 @@ void ofApp::keyPressed(int key)
             bodies.push_back(newbody);
         }
         // Create Planets
-        for (int i = Num_Stars; i < Num_Planets; i++)
+        for (int i = 0; i < Num_Planets; i++)
         {
             body newbody(ofRandom(-init, init), ofRandom(-init, init), ofRandom(-init, init), ofRandom(10, 60), ofRandom(60, 180));
             bodies.push_back(newbody);
         }
         // Create Asteroids
-        for (int i = Num_Planets + 1; i < Num_Planets + Num_Asteroids; i++)
+        for (int i = 0; i < Num_Asteroids; i++)
         {
             body newbody(ofRandom(-init, init), ofRandom(-init, init), ofRandom(-init, init), ofRandom(5, 10), ofRandom(180, 255));
             bodies.push_back(newbody);
@@ -303,6 +300,7 @@ void ofApp::onButtonEvent(ofxDatGuiButtonEvent e)
 {
     if (e.target->is("Start Simulation"))
         keyPressed(' ');
+
 }
 
 void ofApp::onToggleEvent(ofxDatGuiToggleEvent e)
