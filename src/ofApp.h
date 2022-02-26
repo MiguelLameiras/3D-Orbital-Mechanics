@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxGui.h"
+#include "ofxDatGui.h"
 
 class ofApp : public ofBaseApp
 {
@@ -9,7 +10,6 @@ public:
 	void setup();
 	void update();
 	void draw();
-	
 
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -23,29 +23,33 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
+	void onButtonEvent(ofxDatGuiButtonEvent e);
+	void onToggleEvent(ofxDatGuiToggleEvent e);
+	void onSliderEvent(ofxDatGuiSliderEvent e);
+	void onDropdownEvent(ofxDatGuiDropdownEvent e);
+	void onColorPickerEvent(ofxDatGuiColorPickerEvent e);
+
+	uint tIndex;
+
 	bool start;
 	bool show_trails;
+	bool show_axis;
 	ofEasyCam cam;
 	ofLight light;
-	ofxPanel gui;
+	ofxDatGui *UI;
 
 	glm::vec3 center_of_mass; // center of mass position
 	double Total_mass;
+	double proximity;
+	int star_relative_mass;
 
-	ofxIntSlider intSlider1;
-	ofxIntSlider intSlider2;
-	ofxLabel label;
-	ofxLabel center_label;
-	ofxLabel fps_label;
-	ofxToggle trails_button;
-	ofxToggle star_button;
 };
 
 class body
 {
 public:
-	//Constructor and destructor
-	body(int x, int y, int z, double mass_, int hue);//Initial coordinates and hue
+	// Constructor and destructor
+	body(int x, int y, int z, double mass_, int hue); // Initial coordinates and hue
 	~body();
 
 	void update(int body_num, bool show_trails);
