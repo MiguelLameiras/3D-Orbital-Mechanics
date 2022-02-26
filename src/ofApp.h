@@ -44,6 +44,9 @@ public:
 	double proximity;
 	int star_relative_mass;
 
+	int Temp_Num_Planets;
+	int Temp_Num_Asteroids;
+	int Temp_Num_Stars;
 };
 
 class body

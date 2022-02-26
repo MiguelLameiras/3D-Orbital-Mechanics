@@ -4,9 +4,6 @@ vector<body> bodies;
 int Num_Stars;
 int Num_Planets;
 int Num_Asteroids;
-int Temp_Num_Planets;
-int Temp_Num_Asteroids;
-int Temp_Num_Stars;
 double Initial_Max_Velocity;
 
 body::body(int x, int y, int z, double mass_, int hue)
@@ -177,14 +174,16 @@ void ofApp::update()
 void ofApp::draw()
 {
     ofEnableLighting();
-    //ofEnableDepthTest();
+    ofEnableDepthTest();
     light.enable();
     cam.begin();
+    cam.setTarget(glm::vec3(0, 0, 0));
     if (start && Num_Stars == 1)
         cam.setTarget(bodies[0].position); // Define the point where the camera rotates around
     else if(start)
         cam.setTarget(center_of_mass);
     //ofRotateDeg(90, 0, 0, 1); // Rotate the camera to a position
+
     if(show_center)
     {
         ofSetColor(255,255,255);
@@ -202,7 +201,7 @@ void ofApp::draw()
 
     cam.end();
     light.disable();
-    //ofDisableDepthTest();
+    ofDisableDepthTest();
     ofDisableLighting();
 }
 
@@ -223,6 +222,8 @@ void ofApp::keyPressed(int key)
         Num_Stars = Temp_Num_Stars;
 
         int init = 500 * (1 - proximity) + Num_Planets;
+
+        std::cout << Num_Planets << " " << Num_Asteroids << " " << Num_Stars << std::endl;
 
         // Create Planets
         for (int i = 0; i < Num_Stars; i++)
